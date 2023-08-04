@@ -13,11 +13,15 @@ INSERT INTO `command` VALUES
 
 DELETE FROM `dungeon_access_template` WHERE `map_id`=576 AND `difficulty`=2;
 INSERT INTO `dungeon_access_template` (`map_id`, `difficulty`, `min_level`, `max_level`, `min_avg_item_level`, `comment`) VALUES 
-(576, 2, 80, 0, 0, 'Halls of Lightning (Mythic Plus)');
+(576, 2, 80, 0, 0, 'The Nexus (Mythic Plus)'),
+(602, 2, 80, 0, 0, 'Halls of Lightning (Mythic Plus)'),
+(599, 2, 80, 0, 0, 'Halls of Stone (Mythic Plus)');
 
 DELETE FROM `map_difficulty_data` WHERE `MapId`=576 AND `Difficulty`=2;
 INSERT INTO `map_difficulty_data` (`MapId`, `Difficulty`, `ParentDifficulty`, `Comment`) VALUES 
-(576, 2, 1, 'The Nexus (Mythic Plus)');
+(576, 2, 1, 'The Nexus (Mythic Plus)'),
+(602, 2, 1, 'Halls of Lightning (Mythic Plus)'),
+(599, 2, 1, 'Halls of Stone (Mythic Plus)');
 
 -- Spawn stuff in mythic too
 UPDATE creature SET spawnMask = spawnmask | 4 WHERE map = 576;
