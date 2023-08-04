@@ -196,9 +196,9 @@ void InstanceSave::InsertToDB()
 
 time_t InstanceSave::GetResetTimeForDB()
 {
-    // only save the reset time for normal instances
+    // only save the reset time for normal instances, uncomment if you want mythic to have no reset time
     MapEntry const* entry = sMapStore.LookupEntry(GetMapId());
-    if (!entry || entry->map_type == MAP_RAID || GetDifficulty() == DUNGEON_DIFFICULTY_HEROIC)
+    if (!entry || entry->map_type == MAP_RAID || GetDifficulty() == DUNGEON_DIFFICULTY_HEROIC /* || GetDifficulty() == DUNGEON_DIFFICULTY_EPIC */)
         return 0;
     else
         return GetResetTime();

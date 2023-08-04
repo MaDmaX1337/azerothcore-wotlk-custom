@@ -410,7 +410,9 @@ void LoadDBCStores(const std::string& dataPath)
     // fill data
     for (MapDifficultyEntry const* entry : sMapDifficultyStore)
         sMapDifficultyMap[MAKE_PAIR32(entry->MapId, entry->Difficulty)] = MapDifficulty(entry->resetTime, entry->maxPlayers, entry->areaTriggerText[0] != '\0');
-
+		
+		LoadMapDifficultyDataFromDB();
+		
     for (PvPDifficultyEntry const* entry : sPvPDifficultyStore)
         if (entry->bracketId > MAX_BATTLEGROUND_BRACKETS)
             ASSERT(false && "Need update MAX_BATTLEGROUND_BRACKETS by DBC data");
@@ -886,6 +888,57 @@ uint32 GetDefaultMapLight(uint32 mapId)
     }
 
     return 0;
+}
+
+void LoadMapDifficultyDataFromDB()
+{
+    LOG_WARN("server.loading", "server", "Loading custom MapDifficultyData from DB.");
+
+    uint32 oldMSTime = getMSTime();
+
+    uint32 count = 0;
+
+    if (QueryResult result = WorldDatabase.Query("SELECT mapId, difficulty, parentDifficulty FROM map_difficulty_data"))
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+            uint32 mapId = fields[0].Get<uint32>();
+            uint32 difficulty = fields[1].Get<uint32>();
+            uint32 parent = fields[2].Get<uint32>();
+
+            if (difficulty >= MAX_DIFFICULTY)
+            {
+                LOG_INFO("server", "MapDifficultyData (MapId: %u, Difficulty: %u) in table `map_difficulty_data` has invalid difficulty.", mapId, difficulty);
+                continue;
+            }
+
+            MapDifficulty const* diff = GetMapDifficultyData(mapId, Difficulty(parent));
+            if (!diff)
+            {
+                LOG_INFO("server", "MapDifficultyData (MapId: %u, Difficulty: %u) in table `map_difficulty_data` has invalid parent %u.", mapId, difficulty, parent);
+                continue;
+            }
+
+            if (GetMapDifficultyData(mapId, Difficulty(difficulty)))
+            {
+                LOG_INFO("server", "MapDifficultyData (MapId: %u, Difficulty: %u) in table `map_difficulty_data` already listen in dbc. Don't support override.", mapId, difficulty);
+                continue;
+            }
+
+            uint32 resetTime = diff->resetTime;
+            if (difficulty == DUNGEON_DIFFICULTY_EPIC && !resetTime)
+            {
+                resetTime = DAY;
+                LOG_INFO("server", "MapDifficultyData (MapId: %u, Difficulty: %u) in `map_difficulty_data` has no resettime. Setting to default %u.", mapId, difficulty, resetTime);
+            }
+
+            sMapDifficultyMap[MAKE_PAIR32(mapId, difficulty)] = MapDifficulty(resetTime, diff->maxPlayers, diff->hasErrorMessage);
+            ++count;
+        } while (result->NextRow());
+    }
+
+    LOG_WARN("server.loading", ">> Loaded %u custom MapDifficultyData in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 SkillRaceClassInfoEntry const* GetSkillRaceClassInfo(uint32 skill, uint8 race, uint8 class_)

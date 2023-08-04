@@ -69,6 +69,19 @@ enum DoorType
     MAX_DOOR_TYPES,
 };
 
+enum MythicAffix
+{
+    MYTHIC_AFFIX_NONE       = 0,
+    MYTHIC_AFFIX_BURSTING   = 1,
+
+    MYTHIC_AFFIX_MAX
+};
+
+enum MythicSpellId
+{
+    MYTHIC_SPELL_TENACITY   = 58549
+};
+
 struct DoorData
 {
     uint32 entry, bossId;
@@ -252,7 +265,12 @@ public:
     virtual void FillInitialWorldStates(WorldPacket& /*data*/) {}
 
     uint32 GetEncounterCount() const { return bosses.size(); }
-
+	
+	void SetAffixActive(MythicAffix affix) { affixesActive.push_back(affix); }
+    void StartMythic(uint32 level);
+    std::vector<MythicAffix> GetActiveAffixes() { return affixesActive; }
+    void AddAffixAffectedCreature(Creature* creature) { npcs.push_back(creature); }
+		
     // Only used by areatriggers that inherit from OnlyOnceAreaTriggerScript
     void MarkAreaTriggerDone(uint32 id) { _activatedAreaTriggers.insert(id); }
     void ResetAreaTriggerDone(uint32 id) { _activatedAreaTriggers.erase(id); }
@@ -304,6 +322,9 @@ private:
     ObjectInfoMap _gameObjectInfo;
     ObjectGuidMap _objectGuids;
     uint32 completedEncounters; // completed encounter mask, bit indexes are DungeonEncounter.dbc boss numbers, used for packets
+	std::vector<MythicAffix> affixesActive;
+    uint32 mythicLevel;
+    std::vector<Creature*> npcs;
     std::unordered_set<uint32> _activatedAreaTriggers;
 };
 

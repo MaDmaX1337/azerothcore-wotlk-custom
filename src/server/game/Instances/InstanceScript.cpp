@@ -31,6 +31,7 @@
 #include "ScriptMgr.h"
 #include "Spell.h"
 #include "WorldSession.h"
+#include "SpellAuras.h"
 
 BossBoundaryData::~BossBoundaryData()
 {
@@ -745,6 +746,15 @@ std::string InstanceScript::GetBossStateName(uint8 state)
         default:
             return "INVALID";
     }
+}
+
+void InstanceScript::StartMythic(uint32 level)
+{
+    for (Creature* cr : npcs)
+        if (cr)
+            if (Aura* aur = cr->AddAura(MYTHIC_SPELL_TENACITY, cr))
+                aur->SetStackAmount(level);
+			mythicLevel = level;
 }
 
 bool InstanceHasScript(WorldObject const* obj, char const* scriptName)

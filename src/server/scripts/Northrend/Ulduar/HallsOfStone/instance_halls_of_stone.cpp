@@ -123,6 +123,8 @@ public:
 
         void OnCreatureCreate(Creature* creature) override
         {
+			AddAffixAffectedCreature(creature);
+			
             switch(creature->GetEntry())
             {
                 case NPC_SJONNIR:

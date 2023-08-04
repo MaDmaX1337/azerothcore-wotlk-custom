@@ -50,6 +50,8 @@ public:
 
         void OnCreatureCreate(Creature* creature) override
         {
+			AddAffixAffectedCreature(creature);
+			
             Map::PlayerList const& players = instance->GetPlayers();
             TeamId TeamIdInInstance = TEAM_NEUTRAL;
             if (!players.IsEmpty())

@@ -72,6 +72,8 @@ public:
 
         void OnCreatureCreate(Creature* pCreature) override
         {
+			AddAffixAffectedCreature(pCreature);
+			
             switch(pCreature->GetEntry())
             {
                 case NPC_BJARNGRIM:

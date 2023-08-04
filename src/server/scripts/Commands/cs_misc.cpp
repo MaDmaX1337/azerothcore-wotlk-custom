@@ -43,6 +43,7 @@
 #include "TargetedMovementGenerator.h"
 #include "Tokenize.h"
 #include "WeatherMgr.h"
+#include "InstanceScript.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -137,12 +138,148 @@ public:
             { "playall",           HandlePlayAllCommand,           SEC_GAMEMASTER,         Console::No  },
             { "skirmish",          HandleSkirmishCommand,          SEC_ADMINISTRATOR,      Console::No  },
             { "mailbox",           HandleMailBoxCommand,           SEC_MODERATOR,          Console::No  },
+			{ "mythic",            HandleMythicCommand,            SEC_PLAYER,             Console::No  },
             { "string",            HandleStringCommand,            SEC_GAMEMASTER,         Console::No  }
         };
 
         return commandTable;
     }
+	
+	static bool HandleMythicCommand(ChatHandler* handler, char const* args)
+    {
+        Player* usingPlayer = handler->GetSession()->GetPlayer();
+        int32 level = atoi((char*)args);
 
+        if (!*args)
+        {
+            handler->PSendSysMessage("Usage: .mythic 0-3");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        switch (level)
+        {
+        case 0:
+            if (usingPlayer->GetItemCount(60000, false))
+            {
+                if (*args)
+                {
+                    if (usingPlayer->GetMap()->IsDungeon() && usingPlayer->GetInstanceScript() && usingPlayer->GetDungeonDifficulty() != DUNGEON_DIFFICULTY_EPIC)
+                    {
+                        usingPlayer->SetDungeonDifficulty(DUNGEON_DIFFICULTY_EPIC);
+                        usingPlayer->SendDungeonDifficulty(usingPlayer->GetGroup());
+                        //usingPlayer->GetInstanceScript()->StartMythic(level);
+                        //usingPlayer->DestroyItemCount(60000, 1, true);
+                        handler->PSendSysMessage("Dungeon difficulty changed: Dungeon Level: %u (EPIC)", level);
+                        handler->SetSentErrorMessage(true);
+                        return true;
+                    }
+                    else {
+                        handler->PSendSysMessage("Dungeon difficulty can only be changed once in the dungeon itself.");
+                        handler->SetSentErrorMessage(true);
+                        return false;
+                    }
+                }
+            }
+            else {
+                handler->PSendSysMessage("Please obtain the required access key in order to start a Epic Dungeon.");
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
+            break;
+        case 1:
+            if (usingPlayer->GetItemCount(60001, false))
+            {
+                if (*args)
+                {
+                    if (usingPlayer->GetMap()->IsDungeon() && usingPlayer->GetInstanceScript() && usingPlayer->GetDungeonDifficulty() != DUNGEON_DIFFICULTY_EPIC)
+                    {
+                        usingPlayer->SetDungeonDifficulty(DUNGEON_DIFFICULTY_EPIC);
+                        usingPlayer->SendDungeonDifficulty(usingPlayer->GetGroup());
+                        usingPlayer->GetInstanceScript()->StartMythic(level);
+                        handler->PSendSysMessage("Dungeon difficulty changed: Dungeon Level: %u (EPIC)(MYSTIC+)", level);
+                        handler->SetSentErrorMessage(true);
+                        usingPlayer->DestroyItemCount(60001, 1, true);
+                        return true;
+                    }
+                    else {
+                        handler->PSendSysMessage("Dungeon difficulty can only be changed once in the dungeon itself.");
+                        handler->SetSentErrorMessage(true);
+                        return false;
+                    }
+                }
+            }
+            else {
+                handler->PSendSysMessage("Please obtain the required access key in order to start a Epic Mythic+ Dungeon.");
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
+            break;
+        case 2:
+            if (usingPlayer->GetItemCount(60002, false))
+            {
+                if (*args)
+                {
+                    if (usingPlayer->GetMap()->IsDungeon() && usingPlayer->GetInstanceScript() && usingPlayer->GetDungeonDifficulty() != DUNGEON_DIFFICULTY_EPIC)
+                    {
+
+                        usingPlayer->SetDungeonDifficulty(DUNGEON_DIFFICULTY_EPIC);
+                        usingPlayer->SendDungeonDifficulty(usingPlayer->GetGroup());
+                        usingPlayer->GetInstanceScript()->StartMythic(level);
+                        handler->PSendSysMessage("Dungeon difficulty changed: Dungeon Level: %u (EPIC)(MYSTIC+)", level);
+                        handler->SetSentErrorMessage(true);
+                        usingPlayer->DestroyItemCount(60002, 1, true);
+                        return true;
+                    }
+                    else {
+                        handler->PSendSysMessage("Dungeon difficulty can only be changed once in the dungeon itself.");
+                        handler->SetSentErrorMessage(true);
+                        return false;
+                    }
+                }
+            }
+            else {
+                handler->PSendSysMessage("Please obtain the required access key in order to start a Epic Mythic+ Dungeon.");
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
+            break;
+        case 3:
+            if (usingPlayer->GetItemCount(60003, false))
+            {
+                if (*args)
+                {
+                    if (usingPlayer->GetMap()->IsDungeon() && usingPlayer->GetInstanceScript() && usingPlayer->GetDungeonDifficulty() != DUNGEON_DIFFICULTY_EPIC)
+                    {
+
+                        usingPlayer->SetDungeonDifficulty(DUNGEON_DIFFICULTY_EPIC);
+                        usingPlayer->SendDungeonDifficulty(usingPlayer->GetGroup());
+                        usingPlayer->GetInstanceScript()->StartMythic(level);
+                        handler->PSendSysMessage("Dungeon difficulty changed: Dungeon Level: %u (MYSTIC+)(EPIC)", level);
+                        handler->SetSentErrorMessage(true);
+                        usingPlayer->DestroyItemCount(60003, 1, true);
+                        return true;
+                    }
+                    else {
+                        handler->PSendSysMessage("Dungeon difficulty can only be changed once in the dungeon itself.");
+                        handler->SetSentErrorMessage(true);
+                        return false;
+                    }
+                }
+            }
+            else {
+                handler->PSendSysMessage("Please obtain the required access key in order to start a Mythic+ Dungeon.");
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
+            break;
+        default:
+            handler->PSendSysMessage("Level does not exist. Difficulty Level: 1-3 (EPIC)(MYSTIC+) | Difficulty Level: 0 (EPIC)");
+            handler->SetSentErrorMessage(true);
+            break;
+        }
+    }
+	
     static bool HandleSkirmishCommand(ChatHandler* handler, std::vector<std::string_view> args)
     {
         auto tokens = args;

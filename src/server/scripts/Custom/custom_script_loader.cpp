@@ -20,7 +20,11 @@
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
+
+void AddMythicScripts();
+
 void AddCustomScripts()
 {
+	AddMythicScripts();
     // MyExampleScript()
 }
