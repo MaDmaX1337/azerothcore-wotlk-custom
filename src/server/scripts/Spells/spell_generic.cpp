@@ -4997,6 +4997,56 @@ class spell_gen_spirit_of_competition_winner : public SpellScript
     }
 };
 
+// 27360 - Lord Valthalak's Amulet
+enum Valthalak
+{
+    SPELL_INSTILL_LORD_VALTHALAK_SPIRIT = 27360,
+    NPC_LORD_VALTHALAK                  = 16042
+};
+
+class spell_gen_valthalak_amulet : public SpellScript
+{
+    PrepareSpellScript(spell_gen_valthalak_amulet)
+
+    SpellCastResult CheckCast()
+    {
+        if (Unit* target = GetExplTargetUnit())
+            if (target->GetEntry() == NPC_LORD_VALTHALAK && target->isDead())
+                return SPELL_CAST_OK;
+
+        return SPELL_FAILED_BAD_TARGETS;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_gen_valthalak_amulet::CheckCast);
+    }
+};
+
+enum ScourgeBanner
+{
+    GO_COMMAND_TENT = 176210,
+};
+
+class spell_gen_planting_scourge_banner : public SpellScript
+{
+    PrepareSpellScript(spell_gen_planting_scourge_banner)
+
+    SpellCastResult CheckCast()
+    {
+        if (GameObject* tent = GetCaster()->FindNearestGameObject(GO_COMMAND_TENT, 20.0f))
+            if (tent->GetGoState() != GO_STATE_READY) // If tent is burned down
+                return SPELL_CAST_OK;
+
+        return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_gen_planting_scourge_banner::CheckCast);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -5145,4 +5195,6 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_curse_of_pain);
     RegisterSpellScript(spell_gen_spirit_of_competition_participant);
     RegisterSpellScript(spell_gen_spirit_of_competition_winner);
+    RegisterSpellScript(spell_gen_valthalak_amulet);
+    RegisterSpellScript(spell_gen_planting_scourge_banner);
 }
